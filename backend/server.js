@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import { createLogger, format, transports } from 'winston';
 
 import Issue from './models/issue';
 
@@ -11,12 +14,36 @@ const router = express.Router();
 app.use(cors());
 app.use(bodyParser.json());
 
+const logDir = 'log';
+// Create the log directory if it does not exist
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+const filename = path.join(logDir, 'results.log');
+
+var logger = new createLogger({
+  level: 'silly',
+  format: format.combine(
+    format.colorize(),
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+  ),
+  transports: [new transports.Console(), new transports.File({ filename })]
+});
+
+logger.error('Connecting DB');
+logger.warn('Connecting DB');
+logger.info('Connecting DB');
+logger.verbose('Connecting DB');
+logger.debug('Debugging connecting DB');
 mongoose.connect('mongodb://localhost:27017/issues');
 
 const connection = mongoose.connection;
 
 connection.once('open', () => {
-  console.log('MongoDB database connection established successfully!');
+  logger.silly('MongoDB database connection established successfully!');
 });
 
 router.route('/issues').get((req, res) => {

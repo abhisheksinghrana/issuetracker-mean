@@ -12,7 +12,9 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "mongoose": "^5.4.16"
+    "fs": "0.0.1-security",
+    "mongoose": "^5.4.16",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
